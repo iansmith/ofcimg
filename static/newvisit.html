@@ -31,31 +31,32 @@
     <main class="container">
       
     <h3>New Visit</h3>
-    <form action="/api/visit">
+    <form action="/api/visit" method="POST" enctype="application/x-www-form-urlencoded">
         <itemgroup>
             <label>Month</label>
-            <input type="text" >
+            <input id="month" type="text" >
         </itemgroup>
         <itemgroup>
             <label>Day</label>
-            <input type="text" >
+            <input id="day" type="text" >
         </itemgroup>
         <itemgroup>
             <label>Year</label>
-            <input type="text" >
+            <input id="year" type="text" >
         </itemgroup>
         <itemgroup>
             <label>Hour (24 hour notation)</label>
-            <input type="text" >
+            <input id="hour" type="text" >
         </itemgroup>
         <itemgroup>
             <label>Min</label>
-            <input type="text" >
+            <input id="min" type="text" >
         </itemgroup>
         <itemgroup>
             <label>Length (minutes)</label>
-            <input type="text" >
+            <input id="len" type="text" >
         </itemgroup>
+        <input type="submit" value="Submit">
     </form>
 
     </main>
@@ -79,6 +80,9 @@
       }
     });
     
+    function sendVisit() {
+
+    }
   }
   </script>
 </html>

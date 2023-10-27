@@ -19,11 +19,26 @@ type visit struct {
 	q  *gen.Queries
 }
 
+type FormData struct {
+	Day   int64 `param:"day"`
+	Month int64 `param:"month"`
+	Year  int64 `param:"year"`
+	Hour  int64 `param:"hour"`
+	Min   int64 `param:"min"`
+	Len   int64 `param:"len"`
+}
+
 func (v *visit) createVisit(c echo.Context) error {
+	fd := &FormData{}
+	if err := c.Bind(fd); err != nil {
+		return err
+	}
+	log.Printf("bound form data %+v", fd)
 	cvp := gen.CreateVisitParams{
 		StartTimeUnix: 1698426197,
 		LengthSecond:  60 * 15,
 	}
+
 	id, err := v.q.CreateVisit(context.Background(), cvp)
 	if err != nil {
 		return err
@@ -94,7 +109,6 @@ func jsonEncodeResult(c echo.Context, all interface{}) {
 
 	resp.Status = http.StatusOK
 	resp.Writer.Write(buf.Bytes())
-	log.Printf("num bytes %d", buf.Len())
 	resp.Flush()
 	resp.Header().Add("Content-Type", "application/json")
 
