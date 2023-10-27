@@ -3,6 +3,7 @@ package ofcimg
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -11,10 +12,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var ok = []byte("OK")
-
 type visit struct {
-	q *gen.Queries
+	ID int64 `param:"id"`
+	q  *gen.Queries
 }
 
 func (v *visit) createVisit(c echo.Context) error {
@@ -28,38 +28,66 @@ func (v *visit) createVisit(c echo.Context) error {
 	}
 	log.Printf("id is %d", id)
 
-	resp := c.Response()
-	resp.Status = http.StatusOK
-	resp.Writer.Write(ok)
+	c.HTML(http.StatusOK, "ok")
 
 	return nil
 }
 
-type OutputVisit struct {
-	ID           int32
-	StartUnix    int32
-	LengthSecond int32
-}
-
-// getVisit returns all the visits and the client has to
+// listVisit returns all the visits and the client has to
 // sort them out because they might be in the past.
-func (v *visit) getVisit(c echo.Context) error {
-	log.Printf("got to get visit")
+func (v *visit) listVisit(c echo.Context) error {
 	all, err := v.q.ListVisit(context.Background())
 	if err != nil {
-		log.Printf("err was xxx %+v", err)
+		if err == sql.ErrNoRows {
+			c.HTML(http.StatusNotFound, "not found")
+			return nil
+		}
 		return err
 	}
+	jsonEncodeResult(c, all)
+	return nil
+}
+
+// getSingleVisit returns a visit based on the id provided in the url
+func (v *visit) getSingleVisit(c echo.Context) error {
+	only, err := v.q.GetVisit(context.Background(), v.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.HTML(http.StatusNotFound, "not found")
+			return nil
+		}
+		return err
+	}
+	jsonEncodeResult(c, only)
+	return nil
+}
+
+func (v *visit) getSingleVisitImage(c echo.Context) error {
+	only, err := v.q.GetVisit(context.Background(), v.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.HTML(http.StatusNotFound, "not found")
+			return nil
+		}
+		return err
+	}
+}
+
+// jsonEncodeResult is a utility for stuffing everything from an
+// go object to json.
+func jsonEncodeResult(c echo.Context, all interface{}) {
+	resp := c.Response()
 	buf := &bytes.Buffer{}
+
 	enc := json.NewEncoder(buf)
 	if err := enc.Encode(all); err != nil {
-		log.Fatalf("problem doing json encode: %v", err)
+		panic("problem doing json encode:" + err.Error())
 	}
-	resp := c.Response()
+
 	resp.Status = http.StatusOK
 	resp.Writer.Write(buf.Bytes())
 	log.Printf("num bytes %d", buf.Len())
 	resp.Flush()
 	resp.Header().Add("Content-Type", "application/json")
-	return nil
+
 }

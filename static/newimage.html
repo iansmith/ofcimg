@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>office image</title>
+    <meta
+      name="description"
+      content="Simple app to demonstrate the idea of rest interfaces"
+    />
+    <link rel="shortcut icon" href="https://picocss.com/favicon.ico" />
+
+    <!-- Pico.css -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+
+  </head>
+
+  <body>
+    <!-- Header -->
+    <header class="container">
+      <hgroup>
+        <h1>New Image</h1>
+        <h2>Associate an image with an id.</h2>
+      </hgroup>
+
+    </header>
+    <!-- ./ Header -->
+
+
+    <!-- Main -->
+    <main class="container">
+      
+    <h3>New Visit</h3>
+    <form action="/upload" enctype="multipart/form-data" method="POST">
+        Visit Id: <input type="text" name="id"><br>
+        File: <input type="file" name="file"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    </main>
+    <!-- ./ Main -->
+
+    <!-- Footer -->
+    <footer class="container">
+      <small
+        >Built with <a href="https://picocss.com">Pico</a> and extra gravy at Atlanta Tech Village•
+    </small
+      >
+    </footer>
+    <!-- ./ Footer -->
+  </body>
+  <script>
+    onload = async (event) => {
+  }
+  </script>
+</html>

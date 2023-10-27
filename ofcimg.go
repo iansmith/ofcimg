@@ -10,6 +10,8 @@ import (
 	"os"
 
 	"github.com/labstack/echo/v4"
+	el "github.com/labstack/gommon/log"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -22,20 +24,20 @@ var embeddedFiles embed.FS
 func Main() {
 	ctx := context.Background()
 	e := echo.New()
+	e.Logger.SetLevel(el.DEBUG)
 
 	db, err := openDB(ctx)
 	if err != nil {
 		log.Fatalf("unable to open db: %v", err)
 	}
 	query := gen.New(db)
-	visit := &visit{query}
+	vptr := &visit{q: query, ID: 0}
 
-	initRouteVisit(visit, e)
+	initRouteVisit(vptr, e)
 	initStatic(e)
-	e.GET("/bleah", func(c echo.Context) error {
-		log.Printf("xxx %+v", visit)
-		return visit.createVisit(c)
-	})
+	// e.GET("/bleah", func(c echo.Context) error {
+	// 	return vptr.createVisit(c)
+	// })
 	e.Start("localhost:9000")
 }
 
@@ -48,6 +50,11 @@ func initStatic(e *echo.Echo) {
 	})
 	e.GET("/*", echo.WrapHandler(assetHandler))
 	e.GET("/static/*", echo.WrapHandler(http.StripPrefix("/static/", assetHandler)))
+
+	// this was not specified in assignment, so I just did
+	// something simple with html page
+	e.POST("/upload", upload)
+
 }
 
 // initRoute sets up the mapping from url's to functions to call.
@@ -57,7 +64,20 @@ func initRouteVisit(visit *visit, e *echo.Echo) {
 		return visit.createVisit(c)
 	})
 	g.GET("/", func(c echo.Context) error {
-		return visit.getVisit(c)
+		return visit.listVisit(c)
+	})
+	g.GET("/:id", func(c echo.Context) error {
+		if err := c.Bind(visit); err != nil {
+			return err
+		}
+		log.Printf("visit is %d", visit.ID)
+		return visit.getSingleVisit(c)
+	})
+	g.GET("/:id/image", func(c echo.Context) error {
+		if err := c.Bind(visit); err != nil {
+			return err
+		}
+		return visit.getSingleVisitImage(c)
 	})
 }
 

@@ -27,10 +27,23 @@ func (q *Queries) CreateVisit(ctx context.Context, arg CreateVisitParams) (int64
 	return id, err
 }
 
+const getVisit = `-- name: GetVisit :one
+;
+
+SELECT id, start_time_unix, length_second FROM visit WHERE id = ?
+`
+
+func (q *Queries) GetVisit(ctx context.Context, id int64) (Visit, error) {
+	row := q.db.QueryRowContext(ctx, getVisit, id)
+	var i Visit
+	err := row.Scan(&i.ID, &i.StartTimeUnix, &i.LengthSecond)
+	return i, err
+}
+
 const listVisit = `-- name: ListVisit :many
 ;
 
-SELECT id, start_time_unix, length_second FROM visit
+SELECT id, start_time_unix, length_second FROM visit ORDER BY start_time_unix
 `
 
 func (q *Queries) ListVisit(ctx context.Context) ([]Visit, error) {
