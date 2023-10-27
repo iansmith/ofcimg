@@ -35,9 +35,13 @@ func Main() {
 
 	initRouteVisit(vptr, e)
 	initStatic(e)
-	// e.GET("/bleah", func(c echo.Context) error {
-	// 	return vptr.createVisit(c)
-	// })
+
+	// this was not specified in assignment, so I just did
+	// something simple with html page
+	e.POST("/upload", func(c echo.Context) error {
+		return upload(c, query)
+	})
+
 	e.Start("localhost:9000")
 }
 
@@ -50,10 +54,6 @@ func initStatic(e *echo.Echo) {
 	})
 	e.GET("/*", echo.WrapHandler(assetHandler))
 	e.GET("/static/*", echo.WrapHandler(http.StripPrefix("/static/", assetHandler)))
-
-	// this was not specified in assignment, so I just did
-	// something simple with html page
-	e.POST("/upload", upload)
 
 }
 

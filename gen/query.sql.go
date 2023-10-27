@@ -7,7 +7,27 @@ package gen
 
 import (
 	"context"
+	"database/sql"
 )
+
+const addImage = `-- name: AddImage :one
+;
+
+UPDATE visit SET filepath = ? WHERE id = ?
+RETURNING ID
+`
+
+type AddImageParams struct {
+	Filepath sql.NullString
+	ID       int64
+}
+
+func (q *Queries) AddImage(ctx context.Context, arg AddImageParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, addImage, arg.Filepath, arg.ID)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
 
 const createVisit = `-- name: CreateVisit :one
 INSERT INTO visit (start_time_unix, length_second)
@@ -30,20 +50,25 @@ func (q *Queries) CreateVisit(ctx context.Context, arg CreateVisitParams) (int64
 const getVisit = `-- name: GetVisit :one
 ;
 
-SELECT id, start_time_unix, length_second FROM visit WHERE id = ?
+SELECT id, start_time_unix, length_second, filepath FROM visit WHERE id = ?
 `
 
 func (q *Queries) GetVisit(ctx context.Context, id int64) (Visit, error) {
 	row := q.db.QueryRowContext(ctx, getVisit, id)
 	var i Visit
-	err := row.Scan(&i.ID, &i.StartTimeUnix, &i.LengthSecond)
+	err := row.Scan(
+		&i.ID,
+		&i.StartTimeUnix,
+		&i.LengthSecond,
+		&i.Filepath,
+	)
 	return i, err
 }
 
 const listVisit = `-- name: ListVisit :many
 ;
 
-SELECT id, start_time_unix, length_second FROM visit ORDER BY start_time_unix
+SELECT id, start_time_unix, length_second, filepath FROM visit ORDER BY start_time_unix
 `
 
 func (q *Queries) ListVisit(ctx context.Context) ([]Visit, error) {
@@ -55,7 +80,12 @@ func (q *Queries) ListVisit(ctx context.Context) ([]Visit, error) {
 	var items []Visit
 	for rows.Next() {
 		var i Visit
-		if err := rows.Scan(&i.ID, &i.StartTimeUnix, &i.LengthSecond); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.StartTimeUnix,
+			&i.LengthSecond,
+			&i.Filepath,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

@@ -5,9 +5,11 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"ofcimg/gen"
+	"path/filepath"
 
 	"github.com/labstack/echo/v4"
 )
@@ -28,6 +30,7 @@ func (v *visit) createVisit(c echo.Context) error {
 	}
 	log.Printf("id is %d", id)
 
+	c.Response().Header().Add("created", fmt.Sprint(id))
 	c.HTML(http.StatusOK, "ok")
 
 	return nil
@@ -71,6 +74,11 @@ func (v *visit) getSingleVisitImage(c echo.Context) error {
 		}
 		return err
 	}
+	if !only.Filepath.Valid {
+		return fmt.Errorf("unable to get a valid path back from db")
+	}
+	c.Inline(filepath.Join("data", only.Filepath.String), "image")
+	return nil
 }
 
 // jsonEncodeResult is a utility for stuffing everything from an

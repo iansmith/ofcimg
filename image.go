@@ -1,9 +1,12 @@
 package ofcimg
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
 	"io"
 	"net/http"
+	"ofcimg/gen"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -12,7 +15,7 @@ import (
 )
 
 // modified a bit but started with https://echo.labstack.com/docs/cookbook/file-upload
-func upload(c echo.Context) error {
+func upload(c echo.Context, q *gen.Queries) error {
 	// Read form fields
 	raw := c.FormValue("id")
 	id, err := strconv.ParseInt(raw, 10, 64)
@@ -46,5 +49,16 @@ func upload(c echo.Context) error {
 		return err
 	}
 
-	return c.HTML(http.StatusOK, fmt.Sprintf("<p>File %s uploaded successfully with id=%d.</p>", file.Filename, id))
+	p := gen.AddImageParams{
+		Filepath: sql.NullString{
+			String: file.Filename,
+			Valid:  true,
+		},
+		ID: id,
+	}
+	_, err = q.AddImage(context.Background(), p)
+	if err != nil {
+		return err
+	}
+	return c.HTML(http.StatusOK, fmt.Sprintf("updated id %d", id))
 }

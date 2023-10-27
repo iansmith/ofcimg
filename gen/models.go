@@ -4,10 +4,13 @@
 
 package gen
 
-import ()
+import (
+	"database/sql"
+)
 
 type Visit struct {
 	ID            int64
 	StartTimeUnix int64
 	LengthSecond  int64
+	Filepath      sql.NullString
 }
