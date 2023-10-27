@@ -30,8 +30,17 @@
     <!-- Main -->
     <main class="container">
       
+    <div class="grid">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div><input type="button" value="New Visit" onclick="toNewVisit();"></div>
+      <div><input type="button" value="New Image" onclick="toNewImage();"></div>
+    </div>
     <h3>Upcoming Appointments</h3>
-
+    <div id="appt" >
+    </div>
     </main>
     <!-- ./ Main -->
 
@@ -52,7 +61,60 @@
         'Content-Type': 'application/json'
       }
     });
-    
+    const text = await response.text();
+    const resp = JSON.parse(text);
+    const parser= new DOMParser();
+    const target=document.getElementById("appt");
+    while (target.hasChildNodes()) {
+      target.removeChild(target.firstChild);
+    }
+
+    for(var i = 0; i < resp.length; i++) {
+      item = resp[i]
+      const t = item.StartTimeUnix*1000;
+      const date = new Date(t);
+      const dateRep = date.toLocaleDateString() +" "+date.toLocaleTimeString();
+      const len = item.LengthSecond / 60;
+
+      var parent = document.createElement("div")
+
+      var dateDiv = document.createElement('span');
+      dateDiv.textContent=dateRep
+
+      var lenDiv = document.createElement('span');
+      lenDiv.textContent="  length:"+len;
+
+      idSpan=document.createElement("span")
+      idSpan.textContent="[" +  item.ID +"]   "
+
+      var link;
+
+      if (item.Filepath.Valid) {
+        url="/api/visit/"+item.ID +"/image"
+        link=document.createElement("a")
+        link.setAttribute("href",url)
+        img=document.createElement("img")
+        img.setAttribute("src",url)
+        img.setAttribute("width","64px")
+        img.setAttribute("height","64px")
+        link.appendChild(img)
+      }
+
+      parent.appendChild(idSpan)
+      parent.appendChild(dateDiv);
+      parent.appendChild(lenDiv);
+      if (link) {
+        parent.append(link)
+      }
+      target.appendChild(parent);
+    }
+  }
+
+  function toNewVisit() {
+    location.href="/newvisit.html"
+  }
+  function toNewImage() {
+    location.href="/newimage.html"
   }
   </script>
 </html>

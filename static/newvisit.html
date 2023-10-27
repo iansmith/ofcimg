@@ -30,6 +30,16 @@
     <!-- Main -->
     <main class="container">
       
+    <div class="grid">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div><input type="button" value="Back Home" onclick="toBackHome();"></div>
+    </div>
+    
+
     <h3>New Visit</h3>
     <form action="/api/visit" method="POST">
         <itemgroup>
@@ -41,7 +51,7 @@
             <input name="day" type="text" >
         </itemgroup>
         <itemgroup>
-            <label>Year</label>
+            <label>Year (last 2 digits is ok)</label>
             <input name="year" type="text" >
         </itemgroup>
         <itemgroup>
@@ -72,5 +82,9 @@
     <!-- ./ Footer -->
   </body>
   <script>
+  function toBackHome() {
+    location.href="/index.html"
+  }
+
   </script>
 </html>

@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"time"
 
-	_ "time/tzdata"
+	//_ "time/tzdata"
 
 	"github.com/labstack/echo/v4"
 )
@@ -52,6 +52,7 @@ func (v *visit) createVisit(c echo.Context) error {
 	}
 
 	c.Response().Header().Add("created", fmt.Sprint(id))
+	//c.Redirect(http.StatusTemporaryRedirect, "/index.html")
 	c.HTML(http.StatusOK, fmt.Sprintf("id is %d", id))
 
 	return nil
@@ -134,6 +135,9 @@ func convertFormData(c echo.Context) *VisitFormData {
 	result.Day = mustIntConvert(c.FormValue("day"))
 	result.Month = mustIntConvert(c.FormValue("month"))
 	result.Year = mustIntConvert(c.FormValue("year"))
+	if result.Year < 100 {
+		result.Year += 2000
+	}
 	result.Hour = mustIntConvert(c.FormValue("hour"))
 	result.Min = mustIntConvert(c.FormValue("min"))
 	result.Len = mustIntConvert(c.FormValue("len"))
@@ -143,7 +147,7 @@ func convertFormData(c echo.Context) *VisitFormData {
 const tz = "America/NewYork"
 
 func formDataToTimeAndLen(vfd *VisitFormData) (int64, int64) {
-	loc, err := time.LoadLocation("")
+	loc, err := time.LoadLocation("Local")
 	if err != nil {
 		log.Fatalf("unable to find timezone %s: %v", tz, err)
 	}
