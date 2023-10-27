@@ -1,0 +1,8 @@
+## assumes you put the checked out source code at the root of your homedir
+## assumes you have go installed as ~/go1.21
+
+echo ${HOME}
+export PATH=/usr/bin:/bin:/usr/sbin:/sbin:${HOME}/go1.21/bin:${HOME}/ofcimg/tools
+
+## code istalled in bad place
+alias code=/usr/local/bin/code
