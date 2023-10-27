@@ -59,21 +59,21 @@ func initStatic(e *echo.Echo) {
 
 // initRoute sets up the mapping from url's to functions to call.
 func initRouteVisit(visit *visit, e *echo.Echo) {
-	g := e.Group("/api/visit")
-	g.POST("/", func(c echo.Context) error {
+	g := e.Group("/api")
+	g.POST("/visit", func(c echo.Context) error {
 		return visit.createVisit(c)
 	})
-	g.GET("/", func(c echo.Context) error {
+	g.GET("/visit", func(c echo.Context) error {
 		return visit.listVisit(c)
 	})
-	g.GET("/:id", func(c echo.Context) error {
+	g.GET("/visit/:id", func(c echo.Context) error {
 		if err := c.Bind(visit); err != nil {
 			return err
 		}
 		log.Printf("visit is %d", visit.ID)
 		return visit.getSingleVisit(c)
 	})
-	g.GET("/:id/image", func(c echo.Context) error {
+	g.GET("/visit/:id/image", func(c echo.Context) error {
 		if err := c.Bind(visit); err != nil {
 			return err
 		}

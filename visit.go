@@ -10,6 +10,10 @@ import (
 	"net/http"
 	"ofcimg/gen"
 	"path/filepath"
+	"strconv"
+	"time"
+
+	_ "time/tzdata"
 
 	"github.com/labstack/echo/v4"
 )
@@ -19,34 +23,36 @@ type visit struct {
 	q  *gen.Queries
 }
 
-type FormData struct {
-	Day   int64 `param:"day"`
-	Month int64 `param:"month"`
-	Year  int64 `param:"year"`
-	Hour  int64 `param:"hour"`
-	Min   int64 `param:"min"`
-	Len   int64 `param:"len"`
+type VisitFormData struct {
+	Day   int `param:"day"`
+	Month int `param:"month"`
+	Year  int `param:"year"`
+	Hour  int `param:"hour"`
+	Min   int `param:"min"`
+	Len   int `param:"len"`
 }
 
 func (v *visit) createVisit(c echo.Context) error {
-	fd := &FormData{}
-	if err := c.Bind(fd); err != nil {
-		return err
-	}
-	log.Printf("bound form data %+v", fd)
+	// XXX why doesn't this bind work?
+	// err := c.Bind(fd)
+	// if err != nil {
+	// 	return err
+	// }
+	vfd := convertFormData(c)
+	log.Printf("all fields %+v", vfd)
+	unixTime, len := formDataToTimeAndLen(vfd)
 	cvp := gen.CreateVisitParams{
-		StartTimeUnix: 1698426197,
-		LengthSecond:  60 * 15,
+		StartTimeUnix: unixTime,
+		LengthSecond:  len,
 	}
 
 	id, err := v.q.CreateVisit(context.Background(), cvp)
 	if err != nil {
 		return err
 	}
-	log.Printf("id is %d", id)
 
 	c.Response().Header().Add("created", fmt.Sprint(id))
-	c.HTML(http.StatusOK, "ok")
+	c.HTML(http.StatusOK, fmt.Sprintf("id is %d", id))
 
 	return nil
 }
@@ -111,5 +117,40 @@ func jsonEncodeResult(c echo.Context, all interface{}) {
 	resp.Writer.Write(buf.Bytes())
 	resp.Flush()
 	resp.Header().Add("Content-Type", "application/json")
+}
 
+func mustIntConvert(s string) int {
+	i, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		panic("unable to convert integer:" + err.Error())
+	}
+	return int(i)
+}
+
+// xxx why is this needed? Why doesn't using Bind() on the context
+// xxx do this for us?
+func convertFormData(c echo.Context) *VisitFormData {
+	result := &VisitFormData{}
+	result.Day = mustIntConvert(c.FormValue("day"))
+	result.Month = mustIntConvert(c.FormValue("month"))
+	result.Year = mustIntConvert(c.FormValue("year"))
+	result.Hour = mustIntConvert(c.FormValue("hour"))
+	result.Min = mustIntConvert(c.FormValue("min"))
+	result.Len = mustIntConvert(c.FormValue("len"))
+	return result
+}
+
+const tz = "America/NewYork"
+
+func formDataToTimeAndLen(vfd *VisitFormData) (int64, int64) {
+	loc, err := time.LoadLocation("")
+	if err != nil {
+		log.Fatalf("unable to find timezone %s: %v", tz, err)
+	}
+	if vfd.Year < 100 {
+		vfd.Year += 2000
+	}
+	mon := time.Month(vfd.Month)
+	t := time.Date(vfd.Year, mon, vfd.Day, vfd.Hour, vfd.Min, 0, 0, loc)
+	return int64(t.Unix()), int64(vfd.Len * 60)
 }

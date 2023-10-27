@@ -31,31 +31,31 @@
     <main class="container">
       
     <h3>New Visit</h3>
-    <form action="/api/visit" method="POST" enctype="application/x-www-form-urlencoded">
+    <form action="/api/visit" method="POST">
         <itemgroup>
             <label>Month</label>
-            <input id="month" type="text" >
+            <input name="month" type="text" >
         </itemgroup>
         <itemgroup>
             <label>Day</label>
-            <input id="day" type="text" >
+            <input name="day" type="text" >
         </itemgroup>
         <itemgroup>
             <label>Year</label>
-            <input id="year" type="text" >
+            <input name="year" type="text" >
         </itemgroup>
         <itemgroup>
             <label>Hour (24 hour notation)</label>
-            <input id="hour" type="text" >
+            <input name="hour" type="text" >
         </itemgroup>
         <itemgroup>
             <label>Min</label>
-            <input id="min" type="text" >
+            <input name="min" type="text" >
         </itemgroup>
         <itemgroup>
             <label>Length (minutes)</label>
-            <input id="len" type="text" >
-        </itemgroup>
+            <input name="len" type="text" >
+          </itemgroup>
         <input type="submit" value="Submit">
     </form>
 
@@ -72,17 +72,5 @@
     <!-- ./ Footer -->
   </body>
   <script>
-    onload = async (event) => {
-    const response = await fetch('/api/visit/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    function sendVisit() {
-
-    }
-  }
   </script>
 </html>
