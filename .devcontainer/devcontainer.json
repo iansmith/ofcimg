@@ -1,0 +1,19 @@
+{
+	"build": { "dockerfile": "Dockerfile" },
+	"customizations": {
+	  "vscode": {
+		"extensions": [
+			"golang.go",
+			"ms-vscode.makefile-tools",
+			"stkb.rewrap",
+			"ms-vscode-remote.remote-containers"
+		]
+	  }
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}	
+	},
+	
+	"runArgs":["-v", "/var/run/docker.sock:/var/run/docker.sock"],
+	"forwardPorts": [9000]
+  }

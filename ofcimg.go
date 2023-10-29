@@ -8,9 +8,13 @@ import (
 	"net/http"
 	"ofcimg/gen"
 	"os"
+	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	el "github.com/labstack/gommon/log"
+
+	_ "time/tzdata"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -21,10 +25,24 @@ var ddl string
 //go:embed static
 var embeddedFiles embed.FS
 
+var nyc *time.Location
+
 func Main() {
 	ctx := context.Background()
 	e := echo.New()
 	e.Logger.SetLevel(el.DEBUG)
+
+	e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
+		StackSize: 1 << 12, // 4 KB
+		LogLevel:  el.ERROR,
+	}))
+
+	var err error
+	nyc, err = time.LoadLocation("America/New_York")
+	if err != nil {
+		log.Fatalf("Unable to load New York location:%v", err)
+		return
+	}
 
 	db, err := openDB(ctx)
 	if err != nil {

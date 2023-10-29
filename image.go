@@ -3,7 +3,6 @@ package ofcimg
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"io"
 	"net/http"
 	"ofcimg/gen"
@@ -60,5 +59,5 @@ func upload(c echo.Context, q *gen.Queries) error {
 	if err != nil {
 		return err
 	}
-	return c.HTML(http.StatusOK, fmt.Sprintf("updated id %d", id))
+	return c.Redirect(http.StatusFound, "/index.html")
 }

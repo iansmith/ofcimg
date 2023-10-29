@@ -22,7 +22,6 @@
         <h1>Office image</h1>
         <h2>A program to show how REST apis work.</h2>
       </hgroup>
-
     </header>
     <!-- ./ Header -->
 
@@ -78,17 +77,18 @@
 
       var parent = document.createElement("div")
 
-      var dateDiv = document.createElement('span');
+      const dateDiv = document.createElement('span');
       dateDiv.textContent=dateRep
 
       var lenDiv = document.createElement('span');
       lenDiv.textContent="  length:"+len;
 
       idSpan=document.createElement("span")
-      idSpan.textContent="[" +  item.ID +"]   "
+      idSpan.textContent="[ id:" +  item.ID +"]   "
 
-      var link;
+      var link=null;
 
+      console.log("item is ",item);
       if (item.Filepath.Valid) {
         url="/api/visit/"+item.ID +"/image"
         link=document.createElement("a")
@@ -98,13 +98,14 @@
         img.setAttribute("width","64px")
         img.setAttribute("height","64px")
         link.appendChild(img)
+        console.log("id is ",idSpan, " and img ",link)
       }
 
       parent.appendChild(idSpan)
       parent.appendChild(dateDiv);
       parent.appendChild(lenDiv);
       if (link) {
-        parent.append(link)
+        parent.appendChild(link)
       }
       target.appendChild(parent);
     }

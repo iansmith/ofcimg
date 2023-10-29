@@ -6,7 +6,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"ofcimg/gen"
 	"path/filepath"
@@ -39,7 +38,6 @@ func (v *visit) createVisit(c echo.Context) error {
 	// 	return err
 	// }
 	vfd := convertFormData(c)
-	log.Printf("all fields %+v", vfd)
 	unixTime, len := formDataToTimeAndLen(vfd)
 	cvp := gen.CreateVisitParams{
 		StartTimeUnix: unixTime,
@@ -51,9 +49,8 @@ func (v *visit) createVisit(c echo.Context) error {
 		return err
 	}
 
-	c.Response().Header().Add("created", fmt.Sprint(id))
-	//c.Redirect(http.StatusTemporaryRedirect, "/index.html")
-	c.HTML(http.StatusOK, fmt.Sprintf("id is %d", id))
+	c.Response().Header().Add("location", fmt.Sprintf("/visit/%d", id))
+	c.Redirect(http.StatusFound, "/index.html")
 
 	return nil
 }
@@ -147,14 +144,10 @@ func convertFormData(c echo.Context) *VisitFormData {
 const tz = "America/NewYork"
 
 func formDataToTimeAndLen(vfd *VisitFormData) (int64, int64) {
-	loc, err := time.LoadLocation("Local")
-	if err != nil {
-		log.Fatalf("unable to find timezone %s: %v", tz, err)
-	}
 	if vfd.Year < 100 {
 		vfd.Year += 2000
 	}
 	mon := time.Month(vfd.Month)
-	t := time.Date(vfd.Year, mon, vfd.Day, vfd.Hour, vfd.Min, 0, 0, loc)
+	t := time.Date(vfd.Year, mon, vfd.Day, vfd.Hour, vfd.Min, 0, 0, nyc)
 	return int64(t.Unix()), int64(vfd.Len * 60)
 }

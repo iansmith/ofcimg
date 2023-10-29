@@ -43,12 +43,12 @@
     <h3>New Visit</h3>
     <form action="/api/visit" method="POST">
         <itemgroup>
-            <label>Month</label>
-            <input name="month" type="text" >
+            <label>Month (1-12)</label>
+            <input name="month" type="text">
         </itemgroup>
         <itemgroup>
-            <label>Day</label>
-            <input name="day" type="text" >
+            <label>Day (1-31) </label>
+            <input name="day" type="text">
         </itemgroup>
         <itemgroup>
             <label>Year (last 2 digits is ok)</label>
@@ -59,7 +59,7 @@
             <input name="hour" type="text" >
         </itemgroup>
         <itemgroup>
-            <label>Min</label>
+            <label>Min (0-59)</label>
             <input name="min" type="text" >
         </itemgroup>
         <itemgroup>
