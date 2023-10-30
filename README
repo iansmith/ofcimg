@@ -1,11 +1,15 @@
 
-The easiest way to run this program is:
+The easiest way to run this program is to make sure you have docker installed
+and then:
 `docker run -p 9000:9000 iansmith/ofcimg`
-
-
+then point your browser at http://127.0.0.1:9000
 
 The repository:
 github: iansmith/ofcimg
+
+Docker images:
+iansmith/ofcimg is the "run it" container
+The `Dockerfile` in `.devcontainer/Dockerfile` is for use with VSCode.
 
 at time limit checkin: 
 90afa8ba59d96d5af987e20e22bd16ebe213f725
