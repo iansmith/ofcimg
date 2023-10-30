@@ -5,4 +5,5 @@ COPY ofcimg ofcimg
 RUN apk update
 RUN apk add git go delve
 RUN mkdir data
+RUN git clone http://github.com/iansmith/ofcimg src
 ENTRYPOINT ["/ofcimg"]
