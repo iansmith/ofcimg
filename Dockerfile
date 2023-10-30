@@ -1,9 +1,9 @@
 # use example
 # docker buildx build  --platform=linux/amd64,linux/arm64 --push -t iansmith/ofcimg .
-FROM alpine:3.18
+FROM ubuntu:mantic
 COPY ofcimg ofcimg
-RUN apk update
-RUN apk add git go delve
 RUN mkdir data
-RUN git clone http://github.com/iansmith/ofcimg src
+
+ENV CGO_ENABLED=1
+EXPOSE 9000:9000
 ENTRYPOINT ["/ofcimg"]

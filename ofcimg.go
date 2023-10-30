@@ -60,15 +60,16 @@ func Main() {
 		return upload(c, query)
 	})
 
-	e.Start("localhost:9000")
+	e.Start(":9000")
 }
 
 // handle static files at / but also do a redir on /
 func initStatic(e *echo.Echo) {
 	useOS := len(os.Args) > 1 && os.Args[1] == "live"
+	log.Printf("checking for static files...are we in live mode? %v", useOS)
 	assetHandler := http.FileServer(getFileSystem(useOS))
 	e.GET("/", func(c echo.Context) error {
-		return c.Redirect(http.StatusMovedPermanently, "/static/index.html")
+		return c.Redirect(http.StatusTemporaryRedirect, "/static/index.html")
 	})
 	e.GET("/*", echo.WrapHandler(assetHandler))
 	e.GET("/static/*", echo.WrapHandler(http.StripPrefix("/static/", assetHandler)))
